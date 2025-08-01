@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link as ScrollLink } from 'react-scroll';
+import Dashboard from './pages/Dashboard';
 import { 
   Zap, 
   Bot, 
@@ -21,6 +22,7 @@ import {
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -105,6 +107,10 @@ function App() {
     }
   ];
 
+  if (showDashboard) {
+    return <Dashboard />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -123,7 +129,10 @@ function App() {
               <ScrollLink to="pricing" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">Pricing</ScrollLink>
               <ScrollLink to="testimonials" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">Reviews</ScrollLink>
               <ScrollLink to="faq" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">FAQ</ScrollLink>
-              <button className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+              <button 
+                onClick={() => setShowDashboard(true)}
+                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
                 Start Free Trial
               </button>
             </div>
@@ -145,7 +154,10 @@ function App() {
               <ScrollLink to="pricing" smooth={true} duration={500} className="block px-3 py-2 text-gray-600 hover:text-gray-900 cursor-pointer" onClick={() => setIsMenuOpen(false)}>Pricing</ScrollLink>
               <ScrollLink to="testimonials" smooth={true} duration={500} className="block px-3 py-2 text-gray-600 hover:text-gray-900 cursor-pointer" onClick={() => setIsMenuOpen(false)}>Reviews</ScrollLink>
               <ScrollLink to="faq" smooth={true} duration={500} className="block px-3 py-2 text-gray-600 hover:text-gray-900 cursor-pointer" onClick={() => setIsMenuOpen(false)}>FAQ</ScrollLink>
-              <button className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg mt-2">
+              <button 
+                onClick={() => setShowDashboard(true)}
+                className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg mt-2"
+              >
                 Start Free Trial
               </button>
             </div>
@@ -192,6 +204,7 @@ function App() {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setShowDashboard(true)}
                 className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Start Free Trial</span>
@@ -522,6 +535,7 @@ function App() {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowDashboard(true)}
               className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-300"
             >
               Start Your Free Trial
