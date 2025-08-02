@@ -53,7 +53,7 @@ const AppContent: React.FC = () => {
   }
 
   // Show dashboard if authenticated
-  if (isAuthenticated && showDashboard) {
+  if (isAuthenticated) {
     return <Dashboard />;
   }
 
@@ -168,10 +168,10 @@ const AppContent: React.FC = () => {
     }
   ];
 
-  // Show dashboard if user is authenticated and dashboard is requested
-  if (isAuthenticated && showDashboard) {
-    return <Dashboard />;
-  }
+  // This check is now redundant since we handle it above
+  // if (isAuthenticated) {
+  //   return <Dashboard />;
+  // }
 
   return (
     <div className="min-h-screen bg-white">
