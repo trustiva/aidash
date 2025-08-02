@@ -1,0 +1,177 @@
+To ensure that your application is fully functional, with all the features working correctly and accurately reflecting live project data, here’s a **comprehensive test prompt**. This prompt will guide you through testing **every section** of the project, ensuring that all features—particularly the Live Projects section with the sorting and filtering functionality—are fully functional.
+
+Additionally, it will help you verify that the system is pulling live job data accurately from the external platforms (Guru.com, Upwork, Freelancer, Fiverr, and Jobicy), displaying at least **100 live jobs at a time** from each platform.
+
+---
+
+### **Test Prompt for Full System Validation**
+
+#### **1. Authentication and Session Management**
+
+1. **Login and Logout Testing**:
+
+   * Test login with valid credentials (e.g., `john@example.com / password123`).
+   * Test login with invalid credentials and ensure proper error handling (e.g., incorrect password).
+   * Test logout functionality to ensure proper session termination.
+
+2. **Session Persistence**:
+
+   * Log in and test that the session persists across page refreshes.
+   * Test that the session expires after 30 days and verify session renewal when the user is active.
+
+3. **Protected Routes**:
+
+   * Ensure that logged-out users are redirected to the login page when attempting to access the dashboard.
+   * Ensure that authenticated users can access all dashboard sections (Projects, Clients, Invoices, Tasks).
+
+#### **2. Project Management**
+
+1. **CRUD Operations**:
+
+   * **Create** a new project and ensure it is added to the list.
+   * **Update** a project’s details (e.g., status, budget, deadline) and verify that changes are saved.
+   * **Delete** a project and ensure it is removed from the list.
+   * **Filter** projects by status (e.g., Active, Completed, On-Hold).
+   * **Sort** projects by budget (highest/lowest) and check if the list updates correctly.
+
+2. **Client Association**:
+
+   * Assign a client to a project during creation and verify the client’s association.
+   * **Search** for projects linked to specific clients and verify correct results.
+
+3. **Status and Budget Management**:
+
+   * Ensure that project status (e.g., Active, In-Progress) updates are reflected immediately.
+   * Test project budget management and ensure it’s displayed accurately on the dashboard.
+
+#### **3. Client Management**
+
+1. **CRUD Operations**:
+
+   * **Create** a new client and verify the client is added to the list.
+   * **Update** client details (e.g., contact information, company details) and verify changes.
+   * **Delete** a client and ensure it’s removed from the system.
+
+2. **Client Search and Filter**:
+
+   * Test client search functionality (e.g., by name, company, email).
+   * Test client filtering by project association and verify the results.
+
+#### **4. Invoice Management**
+
+1. **Invoice Creation**:
+
+   * **Create** an invoice for a project and verify the invoice is linked to the correct project and client.
+   * **Update** invoice status (e.g., Pending, Paid, Overdue) and ensure the dashboard reflects the correct status.
+
+2. **Payment Tracking and Financial Overview**:
+
+   * Test invoice payment tracking (mark as paid/unpaid) and verify that it’s reflected in the revenue statistics.
+   * Ensure that total revenue is correctly calculated on the dashboard.
+
+3. **Sorting and Filtering**:
+
+   * Test filtering invoices by status (e.g., Pending, Sent, Paid).
+   * Test sorting invoices by payment status and due date.
+
+#### **5. Task Management**
+
+1. **Task CRUD**:
+
+   * **Create** a new task and assign it to a project.
+   * **Update** task status (e.g., To-Do, In-Progress, Completed) and verify that it updates in real-time.
+   * **Delete** a task and ensure it is removed from the project.
+   * **Sort** tasks by priority and status (e.g., Low, Medium, High).
+
+2. **Task Filtering**:
+
+   * Test task filtering by project, priority, and status.
+   * Ensure that filtering results are accurate and that the UI updates accordingly.
+
+#### **6. Live Projects Section**
+
+1. **Live Project Feed Integration**:
+
+   * Ensure that the system pulls **at least 100 live job listings** from each of the following platforms: **Guru.com**, **Upwork**, **Freelancer**, **Fiverr**, and **Jobicy**.
+   * Verify that all the project data includes:
+
+     * Project Title
+     * Budget (min and max)
+     * Skills required
+     * Deadline
+     * Client ratings (if available)
+
+2. **Auto-Refresh Functionality**:
+
+   * Test that the live projects feed auto-refreshes every **30 seconds** and that new projects appear without manual page reload.
+   * Ensure that the UI updates with a visual indicator when new data is loaded.
+
+3. **Sorting Functionality**:
+
+   * Test the new **sorting options**:
+
+     * **Latest First**: Ensure the projects are listed in order of most recently posted.
+     * **Highest Price**: Ensure the projects are sorted by highest budget first.
+     * **Lowest Price**: Ensure the projects are sorted by lowest budget first.
+
+4. **Filter and Search**:
+
+   * **Filter** live projects by platform (e.g., Guru, Upwork, etc.) and ensure the list updates accordingly.
+   * **Search** for projects based on keywords (e.g., "JavaScript," "Design") and verify the results are accurate.
+   * Test the multi-platform filter to ensure that projects from multiple platforms can be viewed together.
+
+5. **Apply Now Functionality**:
+
+   * Test the "Apply Now" button on project cards to ensure it redirects users to the correct platform project page.
+   * Verify that users are correctly redirected to the live project page for each respective freelance platform.
+
+#### **7. Dashboard Analytics and Statistics**
+
+1. **Real-Time Stats**:
+
+   * Test that the statistics on the dashboard (e.g., total revenue, active projects) update in real-time as data changes (e.g., project status, invoice payments).
+   * Ensure that **project completion rates**, **task progress**, and **proposal success rates** are accurately displayed and updated.
+
+2. **Monthly Revenue**:
+
+   * Verify that monthly revenue is accurately calculated based on invoice payments and displayed correctly on the dashboard.
+
+#### **8. UI/UX Testing**
+
+1. **Cross-Browser Testing**:
+
+   * Test the application on different browsers (Chrome, Firefox, Safari) to ensure consistent UI behavior.
+
+2. **Mobile Responsiveness**:
+
+   * Ensure the dashboard and forms are responsive on various mobile devices and screen sizes.
+
+3. **Form Validation**:
+
+   * Ensure that all forms (project creation, client management, invoice creation, task management) properly validate user input and display appropriate error messages.
+
+---
+
+### **9. Performance and Security Testing**
+
+1. **Database Performance**:
+
+   * Test that database queries are optimized for speed, particularly for fetching large amounts of live project data and calculating real-time statistics.
+
+2. **Security**:
+
+   * Ensure that sensitive user data (e.g., passwords, session tokens) is encrypted and stored securely.
+   * Validate that all user inputs are properly sanitized to prevent SQL injection and cross-site scripting (XSS) attacks.
+
+---
+
+### **Summary of Steps:**
+
+1. **Test Authentication**: Ensure login, logout, session persistence, and access to protected routes are working.
+2. **Test CRUD Operations**: Verify project, client, invoice, and task creation, updates, and deletions.
+3. **Test Live Projects**: Ensure live project data is fetched, displayed, filtered, sorted, and auto-refreshed properly.
+4. **Test UI/UX**: Validate responsiveness, cross-browser compatibility, and form validation.
+5. **Test Dashboard Stats**: Verify real-time revenue, project completion, and task progress statistics.
+6. **Security & Performance**: Ensure database queries are optimized and user data is secure.
+
+By following this detailed prompt, you’ll ensure that **all parts of your application are thoroughly tested**, and **live project feeds from multiple platforms** are fully functional with sorting, filtering, and real-time updates. This will also guarantee that **100 live projects** are displayed from each platform and that the application performs smoothly in a production environment.
