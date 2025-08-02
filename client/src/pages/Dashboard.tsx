@@ -6,7 +6,7 @@ import QuickActions from '../components/dashboard/QuickActions';
 import AutomationStatus from '../components/dashboard/AutomationStatus';
 import LatestProjects from '../components/dashboard/LatestProjects';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
-import LiveProjects from '../components/dashboard/LiveProjects';
+import EnhancedLiveProjects from '../components/dashboard/EnhancedLiveProjects';
 import ProposalGenerator from '../components/dashboard/ProposalGenerator';
 import ProjectForm from '../components/forms/ProjectForm';
 import ClientForm from '../components/forms/ClientForm';
@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <LiveProjects />
+              <EnhancedLiveProjects />
             </motion.div>
           )}
 
