@@ -88,12 +88,9 @@ export const automationSettings = pgTable("automation_settings", {
 });
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  email: true,
-  password: true,
-  firstName: true,
-  lastName: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertProjectSchema = createInsertSchema(projects).omit({

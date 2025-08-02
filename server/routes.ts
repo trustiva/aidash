@@ -415,48 +415,48 @@ ${req.user!.username}`,
   // Create HTTP server
   const httpServer = createServer(app);
 
-  // WebSocket setup for real-time features
-  const wss = new WebSocketServer({ noServer: true });
+  // WebSocket setup for real-time features - temporarily commented out to avoid conflicts
+  // const wss = new WebSocketServer({ noServer: true });
 
-  wss.on('connection', (ws, request) => {
-    console.log('WebSocket client connected');
+  // wss.on('connection', (ws, request) => {
+  //   console.log('WebSocket client connected');
 
-    ws.on('message', (message) => {
-      try {
-        const data = JSON.parse(message.toString());
-        console.log('Received WebSocket message:', data);
+  //   ws.on('message', (message) => {
+  //     try {
+  //       const data = JSON.parse(message.toString());
+  //       console.log('Received WebSocket message:', data);
 
-        // Broadcast updates to all connected clients
-        wss.clients.forEach((client) => {
-          if (client.readyState === client.OPEN) {
-            client.send(JSON.stringify({
-              type: 'update',
-              data: data
-            }));
-          }
-        });
-      } catch (error) {
-        console.error('Error handling WebSocket message:', error);
-      }
-    });
+  //       // Broadcast updates to all connected clients
+  //       wss.clients.forEach((client) => {
+  //         if (client.readyState === client.OPEN) {
+  //           client.send(JSON.stringify({
+  //             type: 'update',
+  //             data: data
+  //           }));
+  //         }
+  //       });
+  //     } catch (error) {
+  //       console.error('Error handling WebSocket message:', error);
+  //     }
+  //   });
 
-    ws.on('close', () => {
-      console.log('WebSocket client disconnected');
-    });
+  //   ws.on('close', () => {
+  //     console.log('WebSocket client disconnected');
+  //   });
 
-    // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'connected',
-      message: 'WebSocket connection established'
-    }));
-  });
+  //   // Send welcome message
+  //   ws.send(JSON.stringify({
+  //     type: 'connected',
+  //     message: 'WebSocket connection established'
+  //   }));
+  // });
 
   // Handle WebSocket upgrade
-  httpServer.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
-    });
-  });
+  // httpServer.on('upgrade', (request, socket, head) => {
+  //   wss.handleUpgrade(request, socket, head, (ws) => {
+  //     wss.emit('connection', ws, request);
+  //   });
+  // });
 
   return httpServer;
 }
