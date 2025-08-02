@@ -16,12 +16,12 @@ export const users = pgTable("users", {
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  title: text("title").notNull(),
+  name: text("name").notNull(),
   description: text("description"),
   status: text("status").notNull().default("active"), // active, completed, paused
-  budget: decimal("budget", { precision: 10, scale: 2 }),
-  deadline: timestamp("deadline"),
-  clientName: text("client_name"),
+  budget: text("budget"),
+  deadline: text("deadline"),
+  clientEmail: text("client_email"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -54,11 +54,11 @@ export const invoices = pgTable("invoices", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   projectId: integer("project_id").references(() => projects.id),
-  clientId: integer("client_id").references(() => clients.id).notNull(),
-  invoiceNumber: text("invoice_number").notNull().unique(),
-  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  status: text("status").notNull().default("draft"), // draft, sent, paid, overdue
-  dueDate: timestamp("due_date").notNull(),
+  clientEmail: text("client_email").notNull(),
+  amount: text("amount").notNull(),
+  description: text("description").notNull(),
+  status: text("status").notNull().default("pending"), // pending, sent, paid, overdue
+  dueDate: text("due_date"),
   paidAt: timestamp("paid_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

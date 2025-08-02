@@ -8,24 +8,37 @@ import LatestProjects from '../components/dashboard/LatestProjects';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import LiveProjects from '../components/dashboard/LiveProjects';
 import ProposalGenerator from '../components/dashboard/ProposalGenerator';
+import ProjectForm from '../components/forms/ProjectForm';
+import ClientForm from '../components/forms/ClientForm';
+import InvoiceForm from '../components/forms/InvoiceForm';
+import ClientManagement from '../components/dashboard/ClientManagement';
+import ProjectsManagement from '../components/dashboard/ProjectsManagement';
+import InvoiceManagement from '../components/dashboard/InvoiceManagement';
 import { 
   BarChart3, 
   FileText, 
   Users, 
   Settings,
   Bell,
-  Search
+  Search,
+  Briefcase,
+  CreditCard
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const [activeView, setActiveView] = useState('overview');
   const [showProposalGenerator, setShowProposalGenerator] = useState(false);
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [showClientForm, setShowClientForm] = useState(false);
+  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'live-projects', label: 'Live Projects', icon: Search },
+    { id: 'projects', label: 'My Projects', icon: Briefcase },
     { id: 'proposals', label: 'Proposals', icon: FileText },
     { id: 'clients', label: 'Clients', icon: Users },
+    { id: 'invoices', label: 'Invoices', icon: CreditCard },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -110,9 +123,9 @@ const Dashboard: React.FC = () => {
                 <div className="space-y-6">
                   <QuickActions 
                     onOpenProposalGenerator={() => setShowProposalGenerator(true)}
-                    onOpenClientForm={() => console.log('Open client form')}
-                    onOpenInvoiceForm={() => console.log('Open invoice form')}
-                    onOpenProjectForm={() => console.log('Open project form')}
+                    onOpenClientForm={() => setShowClientForm(true)}
+                    onOpenInvoiceForm={() => setShowInvoiceForm(true)}
+                    onOpenProjectForm={() => setShowProjectForm(true)}
                   />
                   <AutomationStatus />
                 </div>
@@ -127,6 +140,16 @@ const Dashboard: React.FC = () => {
               transition={{ duration: 0.5 }}
             >
               <LiveProjects />
+            </motion.div>
+          )}
+
+          {activeView === 'projects' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ProjectsManagement />
             </motion.div>
           )}
 
@@ -145,10 +168,18 @@ const Dashboard: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-xl shadow-lg p-6"
             >
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Client Management</h2>
-              <p className="text-gray-600">Client management features coming soon...</p>
+              <ClientManagement />
+            </motion.div>
+          )}
+
+          {activeView === 'invoices' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <InvoiceManagement />
             </motion.div>
           )}
 
@@ -166,11 +197,35 @@ const Dashboard: React.FC = () => {
         </main>
       </div>
 
-      {/* Proposal Generator Modal */}
+      {/* Modals */}
       {showProposalGenerator && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <ProposalGenerator onClose={() => setShowProposalGenerator(false)} />
+          </div>
+        </div>
+      )}
+
+      {showProjectForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <ProjectForm onClose={() => setShowProjectForm(false)} />
+          </div>
+        </div>
+      )}
+
+      {showClientForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <ClientForm onClose={() => setShowClientForm(false)} />
+          </div>
+        </div>
+      )}
+
+      {showInvoiceForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <InvoiceForm onClose={() => setShowInvoiceForm(false)} />
           </div>
         </div>
       )}

@@ -35,13 +35,16 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session configuration
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'dev-secret-key',
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-for-lazylancer-platform',
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: false, // Set to true in production with HTTPS
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      httpOnly: true,
+      sameSite: 'lax'
+    },
+    name: 'lazylancer.sid'
   }));
 
   // Passport configuration
