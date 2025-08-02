@@ -91,12 +91,12 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Create sample user
+    // Create sample user with properly hashed password
     const sampleUser: User = {
       id: 1,
       username: "john_doe",
       email: "john@example.com",
-      password: "$2b$10$hashedpassword", // bcrypt hash placeholder
+      password: "$2b$10$CQC09V6z3BQqCOzgXlH/b.m5OhQJanzRi42W/35vF5r3WoVWBmHtC", // bcrypt hash for "password123"
       firstName: "John",
       lastName: "Doe",
       avatar: null,
