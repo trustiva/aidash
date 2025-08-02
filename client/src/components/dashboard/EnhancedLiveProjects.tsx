@@ -40,6 +40,7 @@ const EnhancedLiveProjects: React.FC = () => {
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortOrder, setSortOrder] = useState('latest');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +85,44 @@ const EnhancedLiveProjects: React.FC = () => {
     const matchesCategory = selectedCategory === 'all' || project.category === selectedCategory;
     return matchesPlatform && matchesSearch && matchesCategory;
   });
+
+  // Sort projects based on selected order
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
+    switch (sortOrder) {
+      case 'latest':
+        // Sort by posted time (most recent first)
+        const timeA = parseInt(a.postedTime.match(/\d+/)?.[0] || '0');
+        const timeB = parseInt(b.postedTime.match(/\d+/)?.[0] || '0');
+        return timeA - timeB; // Smaller numbers = more recent
+      case 'highest-price':
+        // Extract highest budget value and sort descending
+        const budgetA = extractMaxBudget(a.budget);
+        const budgetB = extractMaxBudget(b.budget);
+        return budgetB - budgetA;
+      case 'lowest-price':
+        // Extract lowest budget value and sort ascending
+        const minBudgetA = extractMinBudget(a.budget);
+        const minBudgetB = extractMinBudget(b.budget);
+        return minBudgetA - minBudgetB;
+      default:
+        return 0;
+    }
+  });
+
+  // Helper functions to extract budget values
+  const extractMaxBudget = (budget: string): number => {
+    const matches = budget.match(/\$([0-9,]+)/g);
+    if (!matches) return 0;
+    const numbers = matches.map(m => parseInt(m.replace(/[$,]/g, '')));
+    return Math.max(...numbers);
+  };
+
+  const extractMinBudget = (budget: string): number => {
+    const matches = budget.match(/\$([0-9,]+)/g);
+    if (!matches) return 0;
+    const numbers = matches.map(m => parseInt(m.replace(/[$,]/g, '')));
+    return Math.min(...numbers);
+  };
 
   const getPlatformColor = (platform: string) => {
     switch (platform) {
@@ -184,8 +223,8 @@ const EnhancedLiveProjects: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+      {/* Filters and Sorting */}
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -217,6 +256,15 @@ const EnhancedLiveProjects: React.FC = () => {
             <option key={category} value={category}>{category}</option>
           ))}
         </select>
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="latest">Latest First</option>
+          <option value="highest-price">Highest Price</option>
+          <option value="lowest-price">Lowest Price</option>
+        </select>
       </div>
 
       {/* Stats Cards */}
@@ -233,7 +281,7 @@ const EnhancedLiveProjects: React.FC = () => {
             <Target className="w-5 h-5 text-green-600" />
             <span className="text-green-800 font-medium">Filtered</span>
           </div>
-          <p className="text-2xl font-bold text-green-900 mt-1">{filteredProjects.length}</p>
+          <p className="text-2xl font-bold text-green-900 mt-1">{sortedProjects.length}</p>
         </div>
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
@@ -263,8 +311,8 @@ const EnhancedLiveProjects: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : filteredProjects.length > 0 ? (
-          filteredProjects.slice(0, 20).map((project, index) => (
+        ) : sortedProjects.length > 0 ? (
+          sortedProjects.slice(0, 20).map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, x: -20 }}
@@ -353,9 +401,9 @@ const EnhancedLiveProjects: React.FC = () => {
         )}
       </div>
       
-      {filteredProjects.length > 20 && (
+      {sortedProjects.length > 20 && (
         <div className="mt-6 text-center">
-          <p className="text-gray-600">Showing 20 of {filteredProjects.length} projects</p>
+          <p className="text-gray-600">Showing 20 of {sortedProjects.length} projects</p>
         </div>
       )}
     </motion.div>
