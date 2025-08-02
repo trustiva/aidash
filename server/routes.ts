@@ -35,16 +35,18 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session configuration
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'dev-secret-key-for-lazylancer-platform',
+    secret: process.env.SESSION_SECRET || 'dev-secret-key-for-lazylancer-platform-2025',
     resave: false,
     saveUninitialized: false,
+    // Use default memory store for now
     cookie: {
       secure: false, // Set to true in production with HTTPS
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
       sameSite: 'lax'
     },
-    name: 'lazylancer.sid'
+    name: 'lazylancer.sid',
+    rolling: true // Reset expiration on activity
   }));
 
   // Passport configuration
@@ -122,11 +124,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/login', passport.authenticate('local'), (req: Request, res: Response) => {
-    res.json({ 
-      message: 'Login successful',
-      user: req.user
-    });
+  app.post('/api/auth/login', (req: Request, res: Response, next: NextFunction) => {
+    console.log('Login attempt for:', req.body.email);
+    passport.authenticate('local', (err: any, user: Express.User | false, info: any) => {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+      if (!user) {
+        console.log('Login failed:', info?.message);
+        return res.status(401).json({ error: info?.message || "Authentication failed" });
+      }
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error('Session creation error:', err);
+          return res.status(500).json({ error: "Login failed" });
+        }
+        console.log('Login successful for user:', user.id);
+        res.json({ message: "Login successful", user });
+      });
+    })(req, res, next);
   });
 
   app.post('/api/auth/logout', (req: Request, res: Response) => {
@@ -523,7 +541,7 @@ ${req.user!.username}`,
       ).length;
 
       const pendingTasks = tasks.filter(task => 
-        task.status === 'pending' || task.status === 'in_progress'
+        task.status === 'todo' || task.status === 'in_progress'
       ).length;
 
       const completedProjects = projects.filter(project => 
@@ -569,6 +587,57 @@ ${req.user!.username}`,
     } catch (error) {
       console.error('Dashboard stats error:', error);
       res.status(500).json({ error: "Failed to fetch dashboard statistics" });
+    }
+  });
+
+  // Task endpoints
+  app.get('/api/tasks', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const tasks = await storage.getTasks(req.user!.id);
+      res.json({ data: tasks });
+    } catch (error) {
+      console.error('Get tasks error:', error);
+      res.status(500).json({ error: "Failed to fetch tasks" });
+    }
+  });
+
+  app.post('/api/tasks', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const taskData = insertTaskSchema.omit({ userId: true, id: true, createdAt: true, completedAt: true }).parse(req.body);
+      const task = await storage.createTask(req.user!.id, taskData);
+      res.status(201).json({ data: task });
+    } catch (error) {
+      console.error('Create task error:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Validation error', details: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create task" });
+    }
+  });
+
+  app.patch('/api/tasks/:id', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const taskId = parseInt(req.params.id);
+      const updateData = req.body;
+      const task = await storage.updateTask(taskId, req.user!.id, updateData);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json({ data: task });
+    } catch (error) {
+      console.error('Update task error:', error);
+      res.status(500).json({ error: "Failed to update task" });
+    }
+  });
+
+  app.delete('/api/tasks/:id', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const taskId = parseInt(req.params.id);
+      await storage.deleteTask(taskId, req.user!.id);
+      res.json({ message: "Task deleted successfully" });
+    } catch (error) {
+      console.error('Delete task error:', error);
+      res.status(500).json({ error: "Failed to delete task" });
     }
   });
 

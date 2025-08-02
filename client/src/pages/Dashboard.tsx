@@ -14,6 +14,7 @@ import InvoiceForm from '../components/forms/InvoiceForm';
 import ClientManagement from '../components/dashboard/ClientManagement';
 import ProjectsManagement from '../components/dashboard/ProjectsManagement';
 import InvoiceManagement from '../components/dashboard/InvoiceManagement';
+import TaskManagement from '../components/dashboard/TaskManagement';
 import { 
   BarChart3, 
   FileText, 
@@ -22,7 +23,8 @@ import {
   Bell,
   Search,
   Briefcase,
-  CreditCard
+  CreditCard,
+  CheckSquare
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -36,6 +38,7 @@ const Dashboard: React.FC = () => {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'live-projects', label: 'Live Projects', icon: Search },
     { id: 'projects', label: 'My Projects', icon: Briefcase },
+    { id: 'tasks', label: 'Tasks', icon: CheckSquare },
     { id: 'proposals', label: 'Proposals', icon: FileText },
     { id: 'clients', label: 'Clients', icon: Users },
     { id: 'invoices', label: 'Invoices', icon: CreditCard },
@@ -150,6 +153,16 @@ const Dashboard: React.FC = () => {
               transition={{ duration: 0.5 }}
             >
               <ProjectsManagement />
+            </motion.div>
+          )}
+
+          {activeView === 'tasks' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TaskManagement />
             </motion.div>
           )}
 
