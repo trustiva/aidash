@@ -21,7 +21,7 @@ export function useAuth(): AuthData {
     staleTime: Infinity,
   });
 
-  console.log('useAuth data:', data, 'loading:', isLoading, 'error:', error);
+  // console.log('useAuth data:', data, 'loading:', isLoading, 'error:', error);
 
   return {
     user: (data as any)?.user || null,
@@ -41,9 +41,8 @@ export function useLogin() {
       });
     },
     onSuccess: (data) => {
-      console.log('Login successful, invalidating auth queries:', data);
+      // Invalidate and refetch auth state after successful login
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
-      // Force refetch the auth state
       queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });

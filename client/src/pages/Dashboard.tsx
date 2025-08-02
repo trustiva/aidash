@@ -6,6 +6,8 @@ import QuickActions from '../components/dashboard/QuickActions';
 import AutomationStatus from '../components/dashboard/AutomationStatus';
 import LatestProjects from '../components/dashboard/LatestProjects';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import LiveProjects from '../components/dashboard/LiveProjects';
+import ProposalGenerator from '../components/dashboard/ProposalGenerator';
 import { 
   BarChart3, 
   FileText, 
@@ -17,9 +19,11 @@ import {
 
 const Dashboard: React.FC = () => {
   const [activeView, setActiveView] = useState('overview');
+  const [showProposalGenerator, setShowProposalGenerator] = useState(false);
 
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'live-projects', label: 'Live Projects', icon: Search },
     { id: 'proposals', label: 'Proposals', icon: FileText },
     { id: 'clients', label: 'Clients', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -104,10 +108,25 @@ const Dashboard: React.FC = () => {
                   <LatestProjects />
                 </div>
                 <div className="space-y-6">
-                  <QuickActions />
+                  <QuickActions 
+                    onOpenProposalGenerator={() => setShowProposalGenerator(true)}
+                    onOpenClientForm={() => console.log('Open client form')}
+                    onOpenInvoiceForm={() => console.log('Open invoice form')}
+                    onOpenProjectForm={() => console.log('Open project form')}
+                  />
                   <AutomationStatus />
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {activeView === 'live-projects' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <LiveProjects />
             </motion.div>
           )}
 
@@ -146,6 +165,15 @@ const Dashboard: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Proposal Generator Modal */}
+      {showProposalGenerator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <ProposalGenerator onClose={() => setShowProposalGenerator(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

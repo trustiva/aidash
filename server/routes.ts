@@ -412,6 +412,163 @@ ${req.user!.username}`,
     }
   });
 
+  // Latest projects endpoint
+  app.get('/api/projects/latest', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const projects = await storage.getProjectsByUserId(userId);
+      
+      // Sort by creation date and limit to 5 latest
+      const latestProjects = projects
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+      
+      res.json({ data: latestProjects });
+    } catch (error) {
+      console.error('Latest projects error:', error);
+      res.status(500).json({ error: "Failed to fetch latest projects" });
+    }
+  });
+
+  // Live projects from freelance platforms endpoint
+  app.get('/api/projects/live', requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Mock data representing live projects from various platforms
+      // In production, this would integrate with freelance platform APIs
+      const liveProjects = [
+        {
+          id: 'upwork_001',
+          title: 'Build React E-commerce Website',
+          description: 'Looking for an experienced React developer to build a modern e-commerce platform with payment integration.',
+          platform: 'Upwork',
+          budget: '$3000-5000',
+          skills: ['React', 'Node.js', 'MongoDB'],
+          link: 'https://www.upwork.com/jobs/react-ecommerce-website',
+          postedAt: new Date().toISOString(),
+          deadline: '2024-03-15',
+          clientRating: 4.8,
+          proposals: 15
+        },
+        {
+          id: 'freelancer_002',
+          title: 'Mobile App Development - Flutter',
+          description: 'Need a Flutter developer to create a cross-platform mobile app for food delivery service.',
+          platform: 'Freelancer.com',
+          budget: '$2500-4000',
+          skills: ['Flutter', 'Firebase', 'API Integration'],
+          link: 'https://www.freelancer.com/projects/flutter-mobile-app',
+          postedAt: new Date().toISOString(),
+          deadline: '2024-03-20',
+          clientRating: 4.5,
+          proposals: 23
+        },
+        {
+          id: 'fiverr_003',
+          title: 'WordPress Website Customization',
+          description: 'Customize existing WordPress theme with advanced functionality and custom plugins.',
+          platform: 'Fiverr',
+          budget: '$500-1500',
+          skills: ['WordPress', 'PHP', 'MySQL'],
+          link: 'https://www.fiverr.com/wordpress-customization',
+          postedAt: new Date().toISOString(),
+          deadline: '2024-03-10',
+          clientRating: 4.2,
+          proposals: 8
+        },
+        {
+          id: 'guru_004',
+          title: 'Full Stack JavaScript Development',
+          description: 'Seeking a full stack developer for a SaaS application using modern JavaScript technologies.',
+          platform: 'Guru.com',
+          budget: '$4000-7000',
+          skills: ['JavaScript', 'React', 'Express', 'PostgreSQL'],
+          link: 'https://www.guru.com/jobs/full-stack-javascript',
+          postedAt: new Date().toISOString(),
+          deadline: '2024-03-25',
+          clientRating: 4.9,
+          proposals: 31
+        }
+      ];
+      
+      res.json({ data: liveProjects });
+    } catch (error) {
+      console.error('Live projects error:', error);
+      res.status(500).json({ error: "Failed to fetch live projects" });
+    }
+  });
+
+  // Dashboard statistics endpoint
+  app.get('/api/dashboard/stats', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Fetch user's data for statistics
+      const [projects, proposals, invoices, tasks] = await Promise.all([
+        storage.getProjectsByUserId(userId),
+        storage.getProposals(userId),
+        storage.getInvoices(userId),
+        storage.getTasks(userId)
+      ]);
+
+      // Calculate statistics
+      const totalRevenue = invoices
+        .filter(invoice => invoice.status === 'paid')
+        .reduce((sum, invoice) => sum + parseFloat(invoice.amount), 0);
+
+      const activeProjects = projects.filter(project => 
+        project.status === 'active' || project.status === 'in_progress'
+      ).length;
+
+      const pendingTasks = tasks.filter(task => 
+        task.status === 'pending' || task.status === 'in_progress'
+      ).length;
+
+      const completedProjects = projects.filter(project => 
+        project.status === 'completed'
+      ).length;
+
+      const totalProjects = projects.length;
+      const successRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
+
+      const totalProposals = proposals.length;
+      const acceptedProposals = proposals.filter(proposal => 
+        proposal.status === 'accepted'
+      ).length;
+      
+      const proposalSuccessRate = totalProposals > 0 ? Math.round((acceptedProposals / totalProposals) * 100) : 0;
+
+      // Monthly revenue calculation (current month)
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const monthlyRevenue = invoices
+        .filter(invoice => {
+          const invoiceDate = new Date(invoice.createdAt);
+          return invoice.status === 'paid' && 
+                 invoiceDate.getMonth() === currentMonth && 
+                 invoiceDate.getFullYear() === currentYear;
+        })
+        .reduce((sum, invoice) => sum + parseFloat(invoice.amount), 0);
+
+      const stats = {
+        totalRevenue,
+        monthlyRevenue,
+        activeProjects,
+        pendingTasks,
+        successRate,
+        proposalSuccessRate,
+        totalProposals,
+        acceptedProposals,
+        completedProjects,
+        totalProjects
+      };
+
+      res.json({ data: stats });
+    } catch (error) {
+      console.error('Dashboard stats error:', error);
+      res.status(500).json({ error: "Failed to fetch dashboard statistics" });
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
 

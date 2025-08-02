@@ -38,8 +38,8 @@ const AppContent: React.FC = () => {
   
   const { user, isLoading, isAuthenticated } = useAuth();
   
-  // Debug authentication state
-  console.log('Auth state:', { user, isLoading, isAuthenticated });
+  // Debug authentication state (remove in production)
+  // console.log('Auth state:', { user, isLoading, isAuthenticated });
 
   // Show loading state while checking authentication
   if (isLoading) {

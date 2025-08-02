@@ -17,35 +17,47 @@ interface QuickAction {
   action: () => void;
 }
 
-const QuickActions: React.FC = () => {
+interface QuickActionsProps {
+  onOpenProposalGenerator?: () => void;
+  onOpenClientForm?: () => void;
+  onOpenInvoiceForm?: () => void;
+  onOpenProjectForm?: () => void;
+}
+
+const QuickActions: React.FC<QuickActionsProps> = ({ 
+  onOpenProposalGenerator,
+  onOpenClientForm,
+  onOpenInvoiceForm,
+  onOpenProjectForm
+}) => {
   const actions: QuickAction[] = [
     {
       title: 'Generate Proposal',
       description: 'AI-powered proposal creation',
       icon: <FileText className="w-5 h-5" />,
       color: 'from-blue-500 to-cyan-500',
-      action: () => console.log('Generate proposal')
+      action: () => onOpenProposalGenerator?.()
     },
     {
       title: 'Add New Client',
       description: 'Register a new client',
       icon: <Users className="w-5 h-5" />,
       color: 'from-green-500 to-emerald-500',
-      action: () => console.log('Add client')
+      action: () => onOpenClientForm?.()
     },
     {
       title: 'Create Invoice',
       description: 'Generate and send invoice',
       icon: <CreditCard className="w-5 h-5" />,
       color: 'from-purple-500 to-pink-500',
-      action: () => console.log('Create invoice')
+      action: () => onOpenInvoiceForm?.()
     },
     {
       title: 'AI Assistant',
       description: 'Chat with your AI helper',
       icon: <Bot className="w-5 h-5" />,
       color: 'from-orange-500 to-red-500',
-      action: () => console.log('Open AI assistant')
+      action: () => window.open('https://chatgpt.com', '_blank')
     },
     {
       title: 'Start Automation',
@@ -59,7 +71,7 @@ const QuickActions: React.FC = () => {
       description: 'Create a new project',
       icon: <Plus className="w-5 h-5" />,
       color: 'from-teal-500 to-green-500',
-      action: () => console.log('New project')
+      action: () => onOpenProjectForm?.()
     }
   ];
 
