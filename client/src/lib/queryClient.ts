@@ -32,7 +32,15 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
 // Set up default query function
 queryClient.setQueryDefaults(['api'], {
   queryFn: async ({ queryKey }) => {
-    const url = Array.isArray(queryKey) ? queryKey.join('/') : queryKey;
+    const url = Array.isArray(queryKey) ? queryKey.join('') : queryKey;
+    return apiRequest(url as string);
+  },
+});
+
+// Also set defaults for direct API paths
+queryClient.setQueryDefaults(['/api'], {
+  queryFn: async ({ queryKey }) => {
+    const url = Array.isArray(queryKey) ? queryKey.join('') : queryKey;
     return apiRequest(url as string);
   },
 });

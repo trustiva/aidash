@@ -14,11 +14,14 @@ interface AuthData {
 }
 
 export function useAuth(): AuthData {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['/api/auth/me'],
+    queryFn: () => apiRequest('/api/auth/me'),
     retry: false,
     staleTime: Infinity,
   });
+
+  console.log('useAuth data:', data, 'loading:', isLoading, 'error:', error);
 
   return {
     user: (data as any)?.user || null,
@@ -37,8 +40,11 @@ export function useLogin() {
         body: JSON.stringify(credentials),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Login successful, invalidating auth queries:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      // Force refetch the auth state
+      queryClient.refetchQueries({ queryKey: ['/api/auth/me'] });
     },
   });
 }
