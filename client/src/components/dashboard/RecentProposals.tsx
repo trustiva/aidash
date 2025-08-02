@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { 
   FileText, 
   Clock, 
@@ -10,13 +11,13 @@ import {
 } from 'lucide-react';
 
 interface Proposal {
-  id: string;
+  id: number;
   title: string;
-  client: string;
-  amount: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'viewed';
-  submittedAt: string;
-  description: string;
+  clientEmail: string | null;
+  budget: string | null;
+  status: 'draft' | 'sent' | 'accepted' | 'rejected';
+  createdAt: string;
+  content: string;
 }
 
 interface RecentProposalsProps {
@@ -24,55 +25,49 @@ interface RecentProposalsProps {
 }
 
 const RecentProposals: React.FC<RecentProposalsProps> = ({ showAll = false }) => {
-  const proposals: Proposal[] = [
-    {
-      id: '1',
-      title: 'E-commerce Website Development',
-      client: 'TechStart Inc.',
-      amount: '$2,500',
-      status: 'accepted',
-      submittedAt: '2 hours ago',
-      description: 'Full-stack e-commerce platform with React and Node.js'
-    },
-    {
-      id: '2',
-      title: 'Mobile App UI/UX Design',
-      client: 'Creative Agency',
-      amount: '$1,800',
-      status: 'pending',
-      submittedAt: '5 hours ago',
-      description: 'Modern mobile app design for fitness tracking'
-    },
-    {
-      id: '3',
-      title: 'WordPress Blog Setup',
-      client: 'Personal Brand',
-      amount: '$650',
-      status: 'viewed',
-      submittedAt: '1 day ago',
-      description: 'Custom WordPress theme and blog setup'
-    },
-    {
-      id: '4',
-      title: 'Logo Design & Branding',
-      client: 'Startup Co.',
-      amount: '$950',
-      status: 'rejected',
-      submittedAt: '2 days ago',
-      description: 'Complete branding package with logo variations'
-    },
-    {
-      id: '5',
-      title: 'Database Optimization',
-      client: 'Enterprise Corp',
-      amount: '$3,200',
-      status: 'pending',
-      submittedAt: '3 days ago',
-      description: 'MySQL database performance optimization'
-    }
-  ];
+  const { data: proposalsData, isLoading } = useQuery({
+    queryKey: ['/api/proposals/recent'],
+    enabled: true,
+  });
 
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Proposals</h3>
+        </div>
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="p-4 border border-gray-200 rounded-lg animate-pulse">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                </div>
+                <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const proposals: Proposal[] = (proposalsData as any)?.data || [];
   const displayedProposals = showAll ? proposals : proposals.slice(0, 3);
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    return date.toLocaleDateString();
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -143,16 +138,16 @@ const RecentProposals: React.FC<RecentProposalsProps> = ({ showAll = false }) =>
                   </div>
                 </div>
                 
-                <p className="text-gray-600 text-sm mb-2">{proposal.description}</p>
+                <p className="text-gray-600 text-sm mb-2">{proposal.content.slice(0, 100)}...</p>
                 
                 <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>Client: {proposal.client}</span>
-                  <span>{proposal.submittedAt}</span>
+                  <span>Client: {proposal.clientEmail || 'Unknown'}</span>
+                  <span>{formatTimeAgo(proposal.createdAt)}</span>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3 ml-4">
-                <span className="text-lg font-bold text-gray-900">{proposal.amount}</span>
+                <span className="text-lg font-bold text-gray-900">${proposal.budget || '0'}</span>
                 <button className="p-1 hover:bg-gray-100 rounded transition-colors">
                   <MoreHorizontal className="w-4 h-4 text-gray-400" />
                 </button>

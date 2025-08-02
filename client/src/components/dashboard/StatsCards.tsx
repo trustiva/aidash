@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { 
   DollarSign, 
   FileText, 
@@ -19,10 +20,36 @@ interface StatCard {
 }
 
 const StatsCards: React.FC = () => {
-  const stats: StatCard[] = [
+  const { data: statsData, isLoading } = useQuery({
+    queryKey: ['/api/dashboard/stats'],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-12"></div>
+              </div>
+              <div className="h-12 w-12 bg-gray-200 rounded-full"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const stats = (statsData as any)?.data;
+  const successRate = stats ? Math.round((stats.acceptedProposals / Math.max(stats.totalProposals, 1)) * 100) : 0;
+
+  const statCards: StatCard[] = [
     {
-      title: 'Total Earnings',
-      value: '$12,450',
+      title: 'Total Revenue',
+      value: `$${stats?.totalRevenue?.toLocaleString() || '0'}`,
       change: '+15.3%',
       changeType: 'positive',
       icon: <DollarSign className="w-6 h-6" />,
@@ -30,39 +57,39 @@ const StatsCards: React.FC = () => {
     },
     {
       title: 'Active Projects',
-      value: '8',
-      change: '+2',
-      changeType: 'positive',
+      value: stats?.activeProjects?.toString() || '0',
+      change: `${stats?.totalProjects || 0} total`,
+      changeType: 'neutral',
       icon: <FileText className="w-6 h-6" />,
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      title: 'Total Clients',
-      value: '24',
-      change: '+4',
+      title: 'Total Invoices',
+      value: stats?.totalInvoices?.toString() || '0',
+      change: `${stats?.paidInvoices || 0} paid`,
       changeType: 'positive',
       icon: <Users className="w-6 h-6" />,
       color: 'from-purple-500 to-pink-500'
     },
     {
       title: 'Proposals Sent',
-      value: '156',
-      change: '+12',
+      value: stats?.totalProposals?.toString() || '0',
+      change: `${stats?.acceptedProposals || 0} accepted`,
       changeType: 'positive',
       icon: <TrendingUp className="w-6 h-6" />,
       color: 'from-orange-500 to-red-500'
     },
     {
-      title: 'Hours Worked',
-      value: '342',
-      change: '+28h',
-      changeType: 'positive',
+      title: 'Pending Tasks',
+      value: stats?.pendingTasks?.toString() || '0',
+      change: 'Active',
+      changeType: 'neutral',
       icon: <Clock className="w-6 h-6" />,
       color: 'from-indigo-500 to-blue-500'
     },
     {
       title: 'Success Rate',
-      value: '68%',
+      value: `${successRate}%`,
       change: '+5.2%',
       changeType: 'positive',
       icon: <CheckCircle className="w-6 h-6" />,
@@ -72,7 +99,7 @@ const StatsCards: React.FC = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {stats.map((stat, index) => (
+      {statCards.map((stat, index) => (
         <motion.div
           key={stat.title}
           initial={{ opacity: 0, y: 20 }}

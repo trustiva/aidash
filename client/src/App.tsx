@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link as ScrollLink } from 'react-scroll';
 import Dashboard from './pages/Dashboard';
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
+import { useAuth } from './hooks/useAuth';
+import { queryClient } from './lib/queryClient';
 import { 
   Zap, 
   Bot, 
@@ -17,15 +22,71 @@ import {
   Clock,
   Target,
   TrendingUp,
-  Shield
+  Shield,
+  LogOut
 } from 'lucide-react';
 
-function App() {
+// Main App component with authentication logic
+const AppContent: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+  
+  const { user, isLoading, isAuthenticated } = useAuth();
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Zap className="w-8 h-8 text-white" />
+          </div>
+          <p className="text-gray-600">Loading LazyLancer...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show dashboard if authenticated
+  if (isAuthenticated && showDashboard) {
+    return <Dashboard />;
+  }
+
+  // Show auth forms if requested
+  if (showAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
+        {isLogin ? (
+          <LoginForm
+            onSuccess={() => {
+              setShowAuth(false);
+              setShowDashboard(true);
+            }}
+            onSwitchToRegister={() => setIsLogin(false)}
+          />
+        ) : (
+          <RegisterForm
+            onSuccess={() => {
+              setShowAuth(false);
+              setIsLogin(true);
+            }}
+            onSwitchToLogin={() => setIsLogin(true)}
+          />
+        )}
+        <button
+          onClick={() => setShowAuth(false)}
+          className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+    );
+  }
 
   const features = [
     {
@@ -107,7 +168,8 @@ function App() {
     }
   ];
 
-  if (showDashboard) {
+  // Show dashboard if user is authenticated and dashboard is requested
+  if (isAuthenticated && showDashboard) {
     return <Dashboard />;
   }
 
@@ -129,12 +191,39 @@ function App() {
               <ScrollLink to="pricing" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">Pricing</ScrollLink>
               <ScrollLink to="testimonials" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">Reviews</ScrollLink>
               <ScrollLink to="faq" smooth={true} duration={500} className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">FAQ</ScrollLink>
-              <button 
-                onClick={() => setShowDashboard(true)}
-                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-              >
-                Start Free Trial
-              </button>
+              
+              {isAuthenticated ? (
+                <>
+                  <span className="text-gray-600">Welcome, {user?.username}</span>
+                  <button 
+                    onClick={() => setShowDashboard(true)}
+                    className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all duration-200"
+                  >
+                    Dashboard
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => {
+                      setIsLogin(true);
+                      setShowAuth(true);
+                    }}
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIsLogin(false);
+                      setShowAuth(true);
+                    }}
+                    className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    Start Free Trial
+                  </button>
+                </>
+              )}
             </div>
 
             <button 
@@ -600,6 +689,15 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+};
+
+// Main App component with QueryClient provider
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
   );
 }
 
